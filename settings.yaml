@@ -1,0 +1,16 @@
+schedule:
+  # dates: yyyy-mm-dd
+  start_date: "2026-07-01"
+  end_date: "2026-09-30"
+
+  submission_deadline: "2026-06-15"
+
+  allowed_weekdays:
+    - 2   # Tuesday
+    - 6   # Saturday
+
+volunteers:
+  - Renata
+  - Drache
+  - Leo
+  - Riccardo
