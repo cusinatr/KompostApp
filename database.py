@@ -1,7 +1,5 @@
 import sqlite3
-
-DATABASE_NAME = "kompost.db"
-
+from config import DB_PATH
 
 # ---------------------------------------------------
 # Create database and tables
@@ -10,7 +8,7 @@ DATABASE_NAME = "kompost.db"
 
 def initialize_database():
 
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(DB_PATH)
 
     cursor = conn.cursor()
 
@@ -42,7 +40,7 @@ def initialize_database():
 
 def save_availability_submission(volunteer, table_data):
 
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(DB_PATH)
 
     cursor = conn.cursor()
 
@@ -89,7 +87,7 @@ def save_availability_submission(volunteer, table_data):
 
 def load_all_availabilities():
 
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(DB_PATH)
 
     cursor = conn.cursor()
 

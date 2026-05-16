@@ -1,15 +1,14 @@
 from dash import html, dash_table, dcc
 import dash_mantine_components as dmc
-
 import yaml
-
 from datetime import datetime, timedelta, date
+from config import SETTINGS_PATH
 
 # ---------------------------------------------------
 # Load configuration
 # ---------------------------------------------------
 
-with open("settings.yaml", "r") as file:
+with open(SETTINGS_PATH, "r") as file:
     settings = yaml.safe_load(file)
 
 schedule_settings = settings["schedule"]
