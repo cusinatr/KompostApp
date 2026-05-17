@@ -10,7 +10,11 @@ schedule:
     - 6   # Saturday
 
 volunteers:
-  - Renata
-  - Drache
-  - Leo
-  - Riccardo
+  - name: Renata
+    email: renata.pocitarenco19@gmail.com
+
+  - name: Drache
+    email: drache@gmail.com
+
+  - name: Leo
+    email: rr@gmail.com

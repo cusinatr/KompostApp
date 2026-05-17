@@ -144,13 +144,27 @@ layout = html.Div(
         # Volunteer dropdown
         # -----------------------------------------
         html.Label("Volunteer Name"),
-        dcc.Dropdown(
-            id="name-input",
-            options=volunteer_options,
-            placeholder="Select your name",
+        # -----------------------------------------
+        # Email verification
+        # -----------------------------------------
+        html.Label("Volunteer Email"),
+        dcc.Input(
+            id="email-input",
+            type="email",
+            placeholder="Enter your email",
             disabled=not SUBMISSIONS_OPEN,
-            style={"marginBottom": "30px"},
+            style={"width": "100%", "padding": "10px", "marginBottom": "10px"},
         ),
+        html.Button(
+            "Verify Email",
+            id="verify-email-button",
+            n_clicks=0,
+            disabled=not SUBMISSIONS_OPEN,
+            style={"marginBottom": "20px"},
+        ),
+        html.Div(id="verification-message", style={"marginBottom": "20px"}),
+        # Store verified volunteer
+        dcc.Store(id="verified-volunteer-store", data=None),
         # -----------------------------------------
         # Calendar
         # -----------------------------------------
@@ -166,7 +180,7 @@ layout = html.Div(
             allowDeselect=True,
             firstDayOfWeek=1,
             disabledDates=calendar_disabled_dates,
-            style={"marginBottom": "30px"},
+            style={"marginBottom": "30px", "pointerEvents": "none", "opacity": "0.5"},
         ),
         # -----------------------------------------
         # Internal store
@@ -186,8 +200,8 @@ layout = html.Div(
                 },
             ],
             data=[],
-            editable=SUBMISSIONS_OPEN,
-            row_deletable=SUBMISSIONS_OPEN,
+            editable=False,
+            row_deletable=False,
             dropdown={
                 "availability": {
                     "options": [
@@ -207,7 +221,7 @@ layout = html.Div(
             "Submit",
             id="submit-button",
             n_clicks=0,
-            disabled=not SUBMISSIONS_OPEN,
+            disabled=True,
             style={
                 "padding": "10px 20px",
                 "backgroundColor": "green",
@@ -220,6 +234,15 @@ layout = html.Div(
         # -----------------------------------------
         # Submission output
         # -----------------------------------------
+        # Popup confirmation dialog
+        dmc.Modal(
+            id="submission-modal",
+            title="Availability Submitted",
+            opened=False,
+            centered=True,
+            size="lg",
+            children=[html.Div(id="submission-modal-content")],
+        ),
         html.Div(id="submission-output", style={"marginTop": "30px"}),
     ],
 )
