@@ -1,4 +1,5 @@
 import sqlite3
+from config import DB_NAME
 from config import DB_PATH
 
 # ---------------------------------------------------
@@ -102,3 +103,31 @@ def load_all_availabilities():
     conn.close()
 
     return rows
+
+
+# ---------------------------------------------------
+# Load volunteer availability
+# ---------------------------------------------------
+
+
+def load_volunteer_availability(volunteer):
+
+    conn = sqlite3.connect(DB_NAME)
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT date, availability
+        FROM availabilities
+        WHERE volunteer = ?
+        ORDER BY date
+        """,
+        (volunteer,),
+    )
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return [{"date": row[0], "availability": row[1]} for row in rows]

@@ -2,71 +2,20 @@ import yaml
 from dash import Input, Output, State, html, callback_context
 from dash.exceptions import PreventUpdate
 
-from database import save_availability_submission
+from database import save_availability_submission, load_volunteer_availability
+
+# ---------------------------------------------------
+# Load settings
+# ---------------------------------------------------
 
 with open("settings.yaml", "r") as file:
+
     settings = yaml.safe_load(file)
 
-VOLUNTEERS = settings["volunteers"]
+SERVICE_INFORMATION = settings["service_information"]
 
 
 def register_callbacks(app):
-
-    # ---------------------------------------------------
-    # Verify volunteer email
-    # ---------------------------------------------------
-
-    @app.callback(
-        Output("verification-message", "children"),
-        Output("verified-volunteer-store", "data"),
-        Output("multi-date-picker", "style"),
-        Output("availability-table", "editable"),
-        Output("availability-table", "row_deletable"),
-        Output("submit-button", "disabled"),
-        Input("verify-email-button", "n_clicks"),
-        State("email-input", "value"),
-        prevent_initial_call=True,
-    )
-    def verify_email(n_clicks, email):
-
-        if not email:
-
-            return (
-                html.Div("Please enter an email.", style={"color": "red"}),
-                None,
-                {"marginBottom": "30px", "pointerEvents": "none", "opacity": "0.5"},
-                False,
-                False,
-                True,
-            )
-
-        email = email.strip().lower()
-
-        for volunteer in VOLUNTEERS:
-
-            volunteer_email = volunteer["email"].strip().lower()
-
-            if email == volunteer_email:
-
-                volunteer_name = volunteer["name"]
-
-                return (
-                    html.Div(f"Welcome {volunteer_name}!", style={"color": "green"}),
-                    volunteer_name,
-                    {"marginBottom": "30px"},
-                    True,
-                    True,
-                    False,
-                )
-
-        return (
-            html.Div("Email not recognized.", style={"color": "red"}),
-            None,
-            {"marginBottom": "30px", "pointerEvents": "none", "opacity": "0.5"},
-            False,
-            False,
-            True,
-        )
 
     # ---------------------------------------------------
     # Synchronize calendar and table
@@ -135,8 +84,8 @@ def register_callbacks(app):
 
     @app.callback(
         Output("submission-output", "children"),
-        Output("submission-modal", "opened"),
-        Output("submission-modal-content", "children"),
+        Output("submitted-data-store", "data"),
+        Output("url", "pathname", allow_duplicate=True),
         Input("submit-button", "n_clicks"),
         State("verified-volunteer-store", "data"),
         State("availability-table", "data"),
@@ -146,41 +95,128 @@ def register_callbacks(app):
 
         if not volunteer:
 
-            return (html.Div("Please select your name."), False, None)
+            return (html.Div("Volunteer not recognized."), [], "/schedule")
 
         if not table_data:
 
-            return (html.Div("Please select dates."), False, None)
+            return (html.Div("Please select dates."), [], "/schedule")
 
-        # -----------------------------------------
-        # Save submission to SQLite
-        # -----------------------------------------
-
+        # Save submission
         save_availability_submission(volunteer, table_data)
 
-        # -----------------------------------------
-        # Modal content
-        # -----------------------------------------
+        # Redirect to success page
+        return (html.Div(), table_data, "/success")
 
-        modal_content = html.Div(
+    # ---------------------------------------------------
+    # Success Summary
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("success-summary", "children"),
+        Input("submitted-data-store", "data"),
+        State("verified-volunteer-store", "data"),
+    )
+    def display_submission_summary(table_data, volunteer):
+
+        if not table_data:
+            return html.Div("No submission data available.")
+
+        return html.Div(
             [
-                html.H4(f"Thank you {volunteer}!"),
-                html.P("Your availability has been saved " "successfully."),
-                html.Hr(),
-                html.H5("Submitted Availability"),
+                html.H3(f"Thank you {volunteer}!"),
+                html.H4("Submitted Availability"),
                 html.Ul(
                     [
-                        html.Li(f"{row['date']} " f"→ " f"{row['availability']}")
+                        html.Li(f"{row['date']} → {row['availability']}")
                         for row in table_data
                     ]
                 ),
             ]
         )
 
-        return (
-            html.Div([html.H3("Submission Successful")]),
-            # Open modal
-            True,
-            # Modal content
-            modal_content,
+    # ---------------------------------------------------
+    # Navigation Buttons
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("url", "pathname", allow_duplicate=True),
+        Input("modify-button", "n_clicks", allow_optional=True),
+        Input("logout-button", "n_clicks", allow_optional=True),
+        prevent_initial_call=True,
+    )
+    def handle_success_navigation(modify_clicks, logout_clicks):
+
+        trigger = callback_context.triggered[0]["prop_id"]
+
+        if "modify-button" in trigger:
+
+            return "/schedule"
+
+        return "/goodbye"
+
+    # ---------------------------------------------------
+    # Load volunteer availability
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("availability-table", "data", allow_duplicate=True),
+        Output("multi-date-picker", "value", allow_duplicate=True),
+        Input("url", "pathname"),
+        State("verified-volunteer-store", "data"),
+        prevent_initial_call=True,
+    )
+    def load_existing_availability(pathname, volunteer):
+
+        # Only run on schedule page
+        if pathname != "/schedule":
+
+            raise PreventUpdate
+
+        if not volunteer:
+
+            return [], []
+
+        # Load from database
+        table_data = load_volunteer_availability(volunteer)
+
+        if not table_data:
+
+            return [], []
+
+        selected_dates = [row["date"] for row in table_data]
+
+        return (table_data, selected_dates)
+
+    # ---------------------------------------------------
+    # Welcome message
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("welcome-message", "children"), Input("verified-volunteer-store", "data")
+    )
+    def update_welcome_message(volunteer):
+
+        if not volunteer:
+
+            return ""
+
+        # -----------------------------------------
+        # Build service description dynamically
+        # -----------------------------------------
+
+        service_lines = []
+
+        for weekday, info in SERVICE_INFORMATION.items():
+
+            time = info["time"]
+
+            service_lines.append(html.Li(f"{weekday}: {time}"))
+
+        return html.Div(
+            [
+                html.H3(f"Dear {volunteer}, welcome!"),
+                html.P("Please let us know your availability!"),
+                html.P("Remember that the compost service takes place during:"),
+                html.Ul(service_lines),
+            ]
         )

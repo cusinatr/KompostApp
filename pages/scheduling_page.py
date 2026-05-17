@@ -124,7 +124,7 @@ else:
 # Layout
 # ---------------------------------------------------
 
-layout = html.Div(
+scheduling_layout = html.Div(
     style={
         "width": "60%",
         "margin": "auto",
@@ -136,35 +136,13 @@ layout = html.Div(
         # Title
         # -----------------------------------------
         html.H1("Compost Initiative Scheduling"),
+        html.Div(
+            id="welcome-message", style={"marginBottom": "25px", "fontSize": "18px"}
+        ),
         # -----------------------------------------
         # Submission information note
         # -----------------------------------------
         submission_note,
-        # -----------------------------------------
-        # Volunteer dropdown
-        # -----------------------------------------
-        html.Label("Volunteer Name"),
-        # -----------------------------------------
-        # Email verification
-        # -----------------------------------------
-        html.Label("Volunteer Email"),
-        dcc.Input(
-            id="email-input",
-            type="email",
-            placeholder="Enter your email",
-            disabled=not SUBMISSIONS_OPEN,
-            style={"width": "100%", "padding": "10px", "marginBottom": "10px"},
-        ),
-        html.Button(
-            "Verify Email",
-            id="verify-email-button",
-            n_clicks=0,
-            disabled=not SUBMISSIONS_OPEN,
-            style={"marginBottom": "20px"},
-        ),
-        html.Div(id="verification-message", style={"marginBottom": "20px"}),
-        # Store verified volunteer
-        dcc.Store(id="verified-volunteer-store", data=None),
         # -----------------------------------------
         # Calendar
         # -----------------------------------------
@@ -175,12 +153,11 @@ layout = html.Div(
             value=[],
             minDate=START_DATE,
             maxDate=END_DATE,
-            # Open initially on first scheduling month
             defaultDate=START_DATE,
             allowDeselect=True,
             firstDayOfWeek=1,
             disabledDates=calendar_disabled_dates,
-            style={"marginBottom": "30px", "pointerEvents": "none", "opacity": "0.5"},
+            style={"marginBottom": "30px"},
         ),
         # -----------------------------------------
         # Internal store
@@ -200,8 +177,8 @@ layout = html.Div(
                 },
             ],
             data=[],
-            editable=False,
-            row_deletable=False,
+            editable=True,
+            row_deletable=True,
             dropdown={
                 "availability": {
                     "options": [
@@ -221,7 +198,7 @@ layout = html.Div(
             "Submit",
             id="submit-button",
             n_clicks=0,
-            disabled=True,
+            disabled=not SUBMISSIONS_OPEN,
             style={
                 "padding": "10px 20px",
                 "backgroundColor": "green",
@@ -234,15 +211,6 @@ layout = html.Div(
         # -----------------------------------------
         # Submission output
         # -----------------------------------------
-        # Popup confirmation dialog
-        dmc.Modal(
-            id="submission-modal",
-            title="Availability Submitted",
-            opened=False,
-            centered=True,
-            size="lg",
-            children=[html.Div(id="submission-modal-content")],
-        ),
         html.Div(id="submission-output", style={"marginTop": "30px"}),
     ],
 )

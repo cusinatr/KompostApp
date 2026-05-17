@@ -9,6 +9,14 @@ schedule:
     - 2   # Tuesday
     - 6   # Saturday
 
+service_information:
+
+  Tuesday:
+    time: "17:00 - 19:00"
+
+  Saturday:
+    time: "10:00 - 12:00"
+
 volunteers:
   - name: Renata
     email: renata.pocitarenco19@gmail.com
