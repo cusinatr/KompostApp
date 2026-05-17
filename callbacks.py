@@ -9,12 +9,13 @@ from database import (
     load_volunteer_availability,
     load_submitted_volunteers,
 )
+from config import SETTINGS_PATH
 
 # ---------------------------------------------------
 # Load settings
 # ---------------------------------------------------
 
-with open("settings.yaml", "r") as file:
+with open(SETTINGS_PATH, "r") as file:
 
     settings = yaml.safe_load(file)
 
@@ -276,7 +277,7 @@ def register_callbacks(app):
         # Load all volunteers from settings
         # -----------------------------------------
 
-        with open("settings.yaml", "r") as file:
+        with open(SETTINGS_PATH, "r") as file:
 
             settings = yaml.safe_load(file)
 

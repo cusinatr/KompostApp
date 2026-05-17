@@ -1,3 +1,4 @@
+import yaml
 import dash
 from dash import html, dcc, Input, Output, State, no_update
 
@@ -10,17 +11,14 @@ from pages.success_page import success_layout
 from pages.goodbye_page import goodbye_layout
 
 from callbacks import register_callbacks
-
 from database import initialize_database
-
-
-import yaml
+from config import SETTINGS_PATH
 
 # ---------------------------------------------------
 # Load volunteers
 # ---------------------------------------------------
 
-with open("settings.yaml", "r") as file:
+with open(SETTINGS_PATH, "r") as file:
     settings = yaml.safe_load(file)
 
 VOLUNTEERS = settings["volunteers"]
