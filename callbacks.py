@@ -1,8 +1,14 @@
 import yaml
 from dash import Input, Output, State, html, callback_context
 from dash.exceptions import PreventUpdate
+import pandas as pd
+import plotly.express as px
 
-from database import save_availability_submission, load_volunteer_availability
+from database import (
+    save_availability_submission,
+    load_volunteer_availability,
+    load_availability_statistics,
+)
 
 # ---------------------------------------------------
 # Load settings
@@ -220,3 +226,121 @@ def register_callbacks(app):
                 html.Ul(service_lines),
             ]
         )
+
+    # ---------------------------------------------------
+    # Overview graph
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("availability-overview-graph", "figure"), Input("url", "pathname")
+    )
+    def update_overview_graph(pathname):
+
+        if pathname != "/overview":
+
+            raise PreventUpdate
+
+        # -----------------------------------------
+        # Load all volunteers from settings
+        # -----------------------------------------
+
+        with open("settings.yaml", "r") as file:
+
+            settings = yaml.safe_load(file)
+
+        volunteers = sorted([volunteer["name"] for volunteer in settings["volunteers"]])
+
+        # -----------------------------------------
+        # Load statistics from database
+        # -----------------------------------------
+
+        rows = load_availability_statistics()
+
+        # -----------------------------------------
+        # Build dataframe from DB
+        # -----------------------------------------
+
+        if rows:
+
+            df = pd.DataFrame(rows, columns=["Volunteer", "Availability", "Count"])
+
+        else:
+
+            df = pd.DataFrame(columns=["Volunteer", "Availability", "Count"])
+
+        # -----------------------------------------
+        # Ensure ALL volunteers appear
+        # -----------------------------------------
+
+        complete_rows = []
+
+        availability_types = ["Free", "Can make it work"]
+
+        for volunteer in volunteers:
+
+            for availability in availability_types:
+
+                # Check if row exists
+                matching_rows = df[
+                    (df["Volunteer"] == volunteer)
+                    & (df["Availability"] == availability)
+                ]
+
+                if len(matching_rows) > 0:
+
+                    count = matching_rows.iloc[0]["Count"]
+
+                else:
+
+                    count = 0
+
+                complete_rows.append(
+                    {
+                        "Volunteer": volunteer,
+                        "Availability": availability,
+                        "Count": count,
+                    }
+                )
+
+        df_complete = pd.DataFrame(complete_rows)
+
+        # -----------------------------------------
+        # Create figure
+        # -----------------------------------------
+
+        fig = px.bar(
+            df_complete,
+            x="Count",
+            y="Volunteer",
+            color="Availability",
+            orientation="h",
+            barmode="stack",
+            category_orders={"Volunteer": volunteers},
+            title="Submitted Availabilities by Volunteer",
+        )
+
+        fig.update_layout(
+            height=max(400, 80 * len(volunteers)),
+            yaxis_title="Volunteer",
+            xaxis_title="Number of Availabilities",
+        )
+
+        return fig
+
+    # ---------------------------------------------------
+    # Logout
+    # ---------------------------------------------------
+
+    @app.callback(
+        Output("verified-volunteer-store", "data", allow_duplicate=True),
+        Output("url", "pathname", allow_duplicate=True),
+        Input("logout-link", "n_clicks", allow_optional=True),
+        prevent_initial_call=True,
+    )
+    def logout_user(n_clicks):
+
+        if not n_clicks:
+
+            raise PreventUpdate
+
+        return (None, "/goodbye")

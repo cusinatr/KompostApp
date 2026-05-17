@@ -131,3 +131,30 @@ def load_volunteer_availability(volunteer):
     conn.close()
 
     return [{"date": row[0], "availability": row[1]} for row in rows]
+
+
+# ---------------------------------------------------
+# Load volunteer statistics
+# ---------------------------------------------------
+
+
+def load_availability_statistics():
+
+    conn = sqlite3.connect(DB_NAME)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            volunteer,
+            availability,
+            COUNT(*)
+        FROM availabilities
+        GROUP BY volunteer, availability
+        """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows

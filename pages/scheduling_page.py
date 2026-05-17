@@ -135,7 +135,46 @@ scheduling_layout = html.Div(
         # -----------------------------------------
         # Title
         # -----------------------------------------
-        html.H1("Compost Initiative Scheduling"),
+        html.Div(
+            style={
+                "display": "flex",
+                "gap": "30px",
+                "marginBottom": "30px",
+                "borderBottom": "1px solid lightgray",
+                "paddingBottom": "10px",
+            },
+            children=[
+                dcc.Link(
+                    "Scheduling",
+                    href="/schedule",
+                    style={
+                        "fontWeight": "bold",
+                        "fontSize": "20px",
+                        "textDecoration": "none",
+                        "color": "black",
+                    },
+                ),
+                dcc.Link(
+                    "Overview",
+                    href="/overview",
+                    style={
+                        "fontSize": "20px",
+                        "textDecoration": "none",
+                        "color": "gray",
+                    },
+                ),
+                html.A(
+                    "Logout",
+                    id="logout-link",
+                    style={
+                        "fontSize": "20px",
+                        "color": "red",
+                        "cursor": "pointer",
+                        "textDecoration": "none",
+                    },
+                ),
+            ],
+        ),
         html.Div(
             id="welcome-message", style={"marginBottom": "25px", "fontSize": "18px"}
         ),
