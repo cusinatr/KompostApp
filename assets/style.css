@@ -545,7 +545,7 @@ html, body {
 
 .service-hours-reminder {
     margin-top: 1.5rem;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: #1B5E20;
     line-height: 1.6;
     width: 100%;
@@ -563,7 +563,7 @@ html, body {
 .reminder-title {
     margin: 0;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.3rem;
     color: #1B5E20;
 }
 
