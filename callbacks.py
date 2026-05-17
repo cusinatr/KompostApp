@@ -7,7 +7,7 @@ import plotly.express as px
 from database import (
     save_availability_submission,
     load_volunteer_availability,
-    load_availability_statistics,
+    load_submitted_volunteers,
 )
 
 # ---------------------------------------------------
@@ -228,13 +228,13 @@ def register_callbacks(app):
         )
 
     # ---------------------------------------------------
-    # Overview graph
+    # Overview submission table
     # ---------------------------------------------------
 
     @app.callback(
-        Output("availability-overview-graph", "figure"), Input("url", "pathname")
+        Output("overview-table-container", "children"), Input("url", "pathname")
     )
-    def update_overview_graph(pathname):
+    def update_overview_table(pathname):
 
         if pathname != "/overview":
 
@@ -251,81 +251,75 @@ def register_callbacks(app):
         volunteers = sorted([volunteer["name"] for volunteer in settings["volunteers"]])
 
         # -----------------------------------------
-        # Load statistics from database
+        # Load submitted volunteers
         # -----------------------------------------
 
-        rows = load_availability_statistics()
+        submitted_volunteers = load_submitted_volunteers()
 
         # -----------------------------------------
-        # Build dataframe from DB
+        # Create table rows
         # -----------------------------------------
 
-        if rows:
-
-            df = pd.DataFrame(rows, columns=["Volunteer", "Availability", "Count"])
-
-        else:
-
-            df = pd.DataFrame(columns=["Volunteer", "Availability", "Count"])
-
-        # -----------------------------------------
-        # Ensure ALL volunteers appear
-        # -----------------------------------------
-
-        complete_rows = []
-
-        availability_types = ["Free", "Can make it work"]
+        table_rows = []
 
         for volunteer in volunteers:
 
-            for availability in availability_types:
+            submitted = volunteer in submitted_volunteers
 
-                # Check if row exists
-                matching_rows = df[
-                    (df["Volunteer"] == volunteer)
-                    & (df["Availability"] == availability)
-                ]
-
-                if len(matching_rows) > 0:
-
-                    count = matching_rows.iloc[0]["Count"]
-
-                else:
-
-                    count = 0
-
-                complete_rows.append(
-                    {
-                        "Volunteer": volunteer,
-                        "Availability": availability,
-                        "Count": count,
-                    }
+            table_rows.append(
+                html.Tr(
+                    children=[
+                        html.Td(
+                            volunteer,
+                            style={
+                                "padding": "12px",
+                                "borderBottom": "1px solid lightgray",
+                            },
+                        ),
+                        html.Td(
+                            "✅" if submitted else "❌",
+                            style={
+                                "padding": "12px",
+                                "textAlign": "center",
+                                "borderBottom": "1px solid lightgray",
+                                "fontSize": "22px",
+                            },
+                        ),
+                    ]
                 )
-
-        df_complete = pd.DataFrame(complete_rows)
+            )
 
         # -----------------------------------------
-        # Create figure
+        # Return table
         # -----------------------------------------
 
-        fig = px.bar(
-            df_complete,
-            x="Count",
-            y="Volunteer",
-            color="Availability",
-            orientation="h",
-            barmode="stack",
-            category_orders={"Volunteer": volunteers},
-            title="Submitted Availabilities by Volunteer",
+        return html.Table(
+            style={"width": "100%", "borderCollapse": "collapse", "marginTop": "20px"},
+            children=[
+                html.Thead(
+                    html.Tr(
+                        children=[
+                            html.Th(
+                                "Volunteer",
+                                style={
+                                    "textAlign": "left",
+                                    "padding": "12px",
+                                    "borderBottom": "2px solid black",
+                                },
+                            ),
+                            html.Th(
+                                "Submitted",
+                                style={
+                                    "padding": "12px",
+                                    "borderBottom": "2px solid black",
+                                },
+                            ),
+                        ]
+                    )
+                ),
+                html.Tbody(table_rows),
+            ],
         )
-
-        fig.update_layout(
-            height=max(400, 80 * len(volunteers)),
-            yaxis_title="Volunteer",
-            xaxis_title="Number of Availabilities",
-        )
-
-        return fig
 
     # ---------------------------------------------------
     # Logout

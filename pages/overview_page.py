@@ -57,8 +57,8 @@ overview_layout = html.Div(
         html.H1("Volunteer Availability Overview"),
         html.Br(),
         # -----------------------------------------
-        # Graph
+        # Table
         # -----------------------------------------
-        dcc.Graph(id="availability-overview-graph"),
+        html.Div(id="overview-table-container"),
     ],
 )

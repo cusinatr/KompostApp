@@ -158,3 +158,26 @@ def load_availability_statistics():
     conn.close()
 
     return rows
+
+
+# ---------------------------------------------------
+# Volunteers who submitted availability
+# ---------------------------------------------------
+
+
+def load_submitted_volunteers():
+
+    conn = sqlite3.connect(DB_NAME)
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT DISTINCT volunteer
+        FROM availabilities
+        """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return [row[0] for row in rows]
