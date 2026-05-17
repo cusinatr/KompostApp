@@ -11,10 +11,10 @@ schedule:
 
 service_information:
 
-  Tuesday:
+  Dienstag:
     time: "18:00 - 19:00"
 
-  Saturday:
+  Samstag:
     time: "10:00 - 12:00"
 
 volunteers:
