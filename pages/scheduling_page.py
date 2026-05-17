@@ -47,13 +47,6 @@ current_date = start
 
 while current_date <= end:
 
-    # Python weekday:
-    # Monday=0 ... Sunday=6
-    #
-    # Mantine weekday:
-    # Sunday=0 ... Saturday=6
-    #
-    # Convert Python → Mantine
     mantine_weekday = (current_date.weekday() + 1) % 7
 
     if mantine_weekday not in ALLOWED_WEEKDAYS:
@@ -64,8 +57,7 @@ while current_date <= end:
 
 
 # ---------------------------------------------------
-# If submissions are closed,
-# disable ALL dates
+# If submissions are closed, disable ALL dates
 # ---------------------------------------------------
 
 calendar_disabled_dates = disabled_dates.copy()
@@ -82,41 +74,27 @@ if not SUBMISSIONS_OPEN:
 
 
 # ---------------------------------------------------
-# Volunteer dropdown options
-# ---------------------------------------------------
-
-volunteer_options = [
-    {"label": volunteer, "value": volunteer} for volunteer in VOLUNTEERS
-]
-
-
-# ---------------------------------------------------
-# Note component
+# Submission note
 # ---------------------------------------------------
 
 if SUBMISSIONS_OPEN:
 
-    submission_note = dmc.Alert(
-        title="Availability Submission Open",
+    submission_note = html.Div(
+        className="submission-note submission-note-open",
         children=[
-            html.Div(f"Scheduling period: " f"{START_DATE} → {END_DATE}"),
-            html.Div(f"Submission deadline: " f"{SUBMISSION_DEADLINE}"),
+            html.Strong("Anmeldung offen — "),
+            f"Planungszeitraum: {START_DATE} → {END_DATE}   |   Einreichungsfrist: {SUBMISSION_DEADLINE}",
         ],
-        color="green",
-        mb="lg",
     )
 
 else:
 
-    submission_note = dmc.Alert(
-        title="Availability Submission Closed",
+    submission_note = html.Div(
+        className="submission-note submission-note-closed",
         children=[
-            html.Div(
-                f"The submission deadline " f"({SUBMISSION_DEADLINE}) " f"has passed."
-            )
+            html.Strong("Anmeldung geschlossen — "),
+            f"Die Einreichungsfrist ({SUBMISSION_DEADLINE}) ist abgelaufen.",
         ],
-        color="red",
-        mb="lg",
     )
 
 
@@ -125,131 +103,180 @@ else:
 # ---------------------------------------------------
 
 scheduling_layout = html.Div(
-    style={
-        "width": "60%",
-        "margin": "auto",
-        "fontFamily": "Arial",
-        "paddingTop": "30px",
-    },
+    className="page overview-page",
     children=[
-        # -----------------------------------------
-        # Title
-        # -----------------------------------------
         html.Div(
-            style={
-                "display": "flex",
-                "gap": "30px",
-                "marginBottom": "30px",
-                "borderBottom": "1px solid lightgray",
-                "paddingBottom": "10px",
-            },
+            className="overview-container",
             children=[
-                dcc.Link(
-                    "Scheduling",
-                    href="/schedule",
-                    style={
-                        "fontWeight": "bold",
-                        "fontSize": "20px",
-                        "textDecoration": "none",
-                        "color": "black",
-                    },
+                # -----------------------------------------
+                # Navigation bar
+                # -----------------------------------------
+                html.Div(
+                    className="navbar",
+                    children=[
+                        dcc.Link(
+                            "Einsatzplanung",
+                            href="/schedule",
+                            className="nav-link nav-link-active",
+                        ),
+                        dcc.Link(
+                            "Übersicht",
+                            href="/overview",
+                            className="nav-link",
+                        ),
+                        html.A(
+                            "Abmelden",
+                            id="logout-link",
+                            className="nav-link nav-link-logout",
+                        ),
+                    ],
                 ),
-                dcc.Link(
-                    "Overview",
-                    href="/overview",
-                    style={
-                        "fontSize": "20px",
-                        "textDecoration": "none",
-                        "color": "gray",
-                    },
+                # -----------------------------------------
+                # Submission note
+                # -----------------------------------------
+                submission_note,
+                # -----------------------------------------
+                # Welcome message
+                # -----------------------------------------
+                html.Div(id="welcome-message", className="welcome-message"),
+                # -----------------------------------------
+                # Calendar + Table side by side
+                # -----------------------------------------
+                dcc.Store(id="selected-dates-store", data=[]),
+                html.Div(
+                    className="scheduling-main",
+                    children=[
+                        # Calendar
+                        html.Div(
+                            className="calendar-wrapper",
+                            children=[
+                                dmc.DatePicker(
+                                    id="multi-date-picker",
+                                    type="multiple",
+                                    value=[],
+                                    minDate=START_DATE,
+                                    maxDate=END_DATE,
+                                    defaultDate=START_DATE,
+                                    allowDeselect=True,
+                                    firstDayOfWeek=1,
+                                    disabledDates=calendar_disabled_dates,
+                                    styles={
+                                        "calendarHeader": {
+                                            "display": "flex",
+                                            "justifyContent": "center",
+                                            "alignItems": "center",
+                                            "width": "100%",
+                                        },
+                                        "calendarHeaderLevel": {
+                                            "flex": "1",
+                                            "textAlign": "center",
+                                            "whiteSpace": "nowrap",
+                                            "fontWeight": "bold",
+                                        },
+                                    },
+                                ),
+                                html.Div(
+                                    id="service-hours-reminder",
+                                    className="service-hours-reminder",
+                                ),
+                            ],
+                        ),
+                        # Table
+                        html.Div(
+                            className="scheduling-table-wrapper",
+                            children=[
+                                dash_table.DataTable(
+                                    id="availability-table",
+                                    fixed_rows={"headers": True},
+                                    columns=[
+                                        {"name": "Datum", "id": "date"},
+                                        {
+                                            "name": "Präferenz",
+                                            "id": "availability",
+                                            "presentation": "dropdown",
+                                        },
+                                    ],
+                                    data=[],
+                                    editable=True,
+                                    row_deletable=True,
+                                    dropdown={
+                                        "availability": {
+                                            "options": [
+                                                {"label": "Frei", "value": "Free"},
+                                                {
+                                                    "label": "Kann funktionieren",
+                                                    "value": "Can make it work",
+                                                },
+                                            ]
+                                        }
+                                    },
+                                    style_table={
+                                        "overflowX": "auto",
+                                        "overflowY": "auto",
+                                        "height": "100%",
+                                        "borderRadius": "0.6rem",
+                                        "border": "1px solid #90A4AE",
+                                    },
+                                    style_header={
+                                        "backgroundColor": "#546E7A",
+                                        "color": "white",
+                                        "fontWeight": "bold",
+                                        "textAlign": "center",
+                                        "padding": "0.8rem 1.2rem",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "1.1rem",
+                                        "border": "none",
+                                    },
+                                    style_cell={
+                                        "textAlign": "center",
+                                        "padding": "0.7rem 1.2rem",
+                                        "fontFamily": "Arial",
+                                        "fontSize": "1.1rem",
+                                        "border": "none",
+                                        "borderTop": "1px solid #90A4AE",
+                                        "color": "#1C2B33",
+                                    },
+                                    style_data_conditional=[
+                                        {
+                                            "if": {"row_index": "odd"},
+                                            "backgroundColor": "#B0BEC5",
+                                        },
+                                        {
+                                            "if": {"row_index": "even"},
+                                            "backgroundColor": "#CFD8DC",
+                                        },
+                                        {
+                                            "if": {"state": "selected"},
+                                            "backgroundColor": "#90A4AE",
+                                            "border": "none",
+                                        },
+                                    ],
+                                ),
+                            ],
+                        ),
+                    ],
                 ),
-                html.A(
-                    "Logout",
-                    id="logout-link",
-                    style={
-                        "fontSize": "20px",
-                        "color": "red",
-                        "cursor": "pointer",
-                        "textDecoration": "none",
-                    },
+                # -----------------------------------------
+                # Submit button
+                # -----------------------------------------
+                html.Div(
+                    className="submit-wrapper",
+                    children=[
+                        html.Button(
+                            "Einreichen",
+                            id="submit-button",
+                            n_clicks=0,
+                            disabled=not SUBMISSIONS_OPEN,
+                            className="verify-button"
+                            + ("" if SUBMISSIONS_OPEN else " button-disabled"),
+                        ),
+                    ],
                 ),
+                # -----------------------------------------
+                # Submission output
+                # -----------------------------------------
+                html.Div(id="submission-output", className="submission-output"),
             ],
-        ),
-        html.Div(
-            id="welcome-message", style={"marginBottom": "25px", "fontSize": "18px"}
-        ),
-        # -----------------------------------------
-        # Submission information note
-        # -----------------------------------------
-        submission_note,
-        # -----------------------------------------
-        # Calendar
-        # -----------------------------------------
-        html.H3("Select Your Available Dates"),
-        dmc.DatePicker(
-            id="multi-date-picker",
-            type="multiple",
-            value=[],
-            minDate=START_DATE,
-            maxDate=END_DATE,
-            defaultDate=START_DATE,
-            allowDeselect=True,
-            firstDayOfWeek=1,
-            disabledDates=calendar_disabled_dates,
-            style={"marginBottom": "30px"},
-        ),
-        # -----------------------------------------
-        # Internal store
-        # -----------------------------------------
-        dcc.Store(id="selected-dates-store", data=[]),
-        # -----------------------------------------
-        # Availability table
-        # -----------------------------------------
-        dash_table.DataTable(
-            id="availability-table",
-            columns=[
-                {"name": "Date", "id": "date"},
-                {
-                    "name": "Availability",
-                    "id": "availability",
-                    "presentation": "dropdown",
-                },
-            ],
-            data=[],
-            editable=True,
-            row_deletable=True,
-            dropdown={
-                "availability": {
-                    "options": [
-                        {"label": "Free", "value": "Free"},
-                        {"label": "Can make it work", "value": "Can make it work"},
-                    ]
-                }
-            },
-            style_table={"overflowX": "auto"},
-            style_cell={"textAlign": "left", "padding": "10px"},
-        ),
-        html.Br(),
-        # -----------------------------------------
-        # Submit button
-        # -----------------------------------------
-        html.Button(
-            "Submit",
-            id="submit-button",
-            n_clicks=0,
-            disabled=not SUBMISSIONS_OPEN,
-            style={
-                "padding": "10px 20px",
-                "backgroundColor": "green",
-                "color": "white",
-                "border": "none",
-                "cursor": "pointer",
-                "opacity": ("1" if SUBMISSIONS_OPEN else "0.5"),
-            },
-        ),
-        # -----------------------------------------
-        # Submission output
-        # -----------------------------------------
-        html.Div(id="submission-output", style={"marginTop": "30px"}),
+        )
     ],
 )

@@ -99,13 +99,8 @@ def register_callbacks(app):
     )
     def submit_form(n_clicks, volunteer, table_data):
 
-        if not volunteer:
-
-            return (html.Div("Volunteer not recognized."), [], "/schedule")
-
-        if not table_data:
-
-            return (html.Div("Please select dates."), [], "/schedule")
+        if not volunteer or not table_data:
+            raise PreventUpdate
 
         # Save submission
         save_availability_submission(volunteer, table_data)
@@ -125,19 +120,51 @@ def register_callbacks(app):
     def display_submission_summary(table_data, volunteer):
 
         if not table_data:
-            return html.Div("No submission data available.")
+            return html.Div("Keine Einreichungsdaten verfügbar.")
 
         return html.Div(
-            [
-                html.H3(f"Thank you {volunteer}!"),
-                html.H4("Submitted Availability"),
-                html.Ul(
-                    [
-                        html.Li(f"{row['date']} → {row['availability']}")
-                        for row in table_data
-                    ]
+            className="summary-container",
+            children=[
+                html.H2(f"Merci, {volunteer}!", className="thank-you-title"),
+                html.H4("Eingereichte Verfügbarkeit:", className="summary-subtitle"),
+                html.Div(
+                    className="summary-table-wrapper",
+                    children=[
+                        html.Table(
+                            className="summary-table",
+                            children=[
+                                html.Thead(
+                                    html.Tr(
+                                        [
+                                            html.Th("Datum", className="summary-th"),
+                                            html.Th(
+                                                "Verfügbarkeit", className="summary-th"
+                                            ),
+                                        ]
+                                    )
+                                ),
+                                html.Tbody(
+                                    [
+                                        html.Tr(
+                                            className="summary-row",
+                                            children=[
+                                                html.Td(
+                                                    row["date"], className="summary-td"
+                                                ),
+                                                html.Td(
+                                                    row["availability"],
+                                                    className="summary-td",
+                                                ),
+                                            ],
+                                        )
+                                        for row in table_data
+                                    ]
+                                ),
+                            ],
+                        )
+                    ],
                 ),
-            ]
+            ],
         )
 
     # ---------------------------------------------------
@@ -198,34 +225,35 @@ def register_callbacks(app):
     # ---------------------------------------------------
 
     @app.callback(
-        Output("welcome-message", "children"), Input("verified-volunteer-store", "data")
+        Output("welcome-message", "children"),
+        Output("service-hours-reminder", "children"),
+        Input("verified-volunteer-store", "data"),
     )
     def update_welcome_message(volunteer):
 
         if not volunteer:
-
-            return ""
-
-        # -----------------------------------------
-        # Build service description dynamically
-        # -----------------------------------------
+            return "", ""
 
         service_lines = []
 
         for weekday, info in SERVICE_INFORMATION.items():
-
             time = info["time"]
-
             service_lines.append(html.Li(f"{weekday}: {time}"))
 
-        return html.Div(
+        welcome = html.Div(
             [
                 html.H3(f"Dear {volunteer}, welcome!"),
-                html.P("Please let us know your availability!"),
-                html.P("Remember that the compost service takes place during:"),
+            ]
+        )
+
+        reminder = html.Div(
+            [
+                html.P("Einsatzzeiten:", className="reminder-title"),
                 html.Ul(service_lines),
             ]
         )
+
+        return welcome, reminder
 
     # ---------------------------------------------------
     # Overview submission table
@@ -269,22 +297,8 @@ def register_callbacks(app):
             table_rows.append(
                 html.Tr(
                     children=[
-                        html.Td(
-                            volunteer,
-                            style={
-                                "padding": "12px",
-                                "borderBottom": "1px solid lightgray",
-                            },
-                        ),
-                        html.Td(
-                            "✅" if submitted else "❌",
-                            style={
-                                "padding": "12px",
-                                "textAlign": "center",
-                                "borderBottom": "1px solid lightgray",
-                                "fontSize": "22px",
-                            },
-                        ),
+                        html.Td(volunteer),
+                        html.Td("✅" if submitted else "❌"),
                     ]
                 )
             )
@@ -294,26 +308,12 @@ def register_callbacks(app):
         # -----------------------------------------
 
         return html.Table(
-            style={"width": "100%", "borderCollapse": "collapse", "marginTop": "20px"},
             children=[
                 html.Thead(
                     html.Tr(
                         children=[
-                            html.Th(
-                                "Volunteer",
-                                style={
-                                    "textAlign": "left",
-                                    "padding": "12px",
-                                    "borderBottom": "2px solid black",
-                                },
-                            ),
-                            html.Th(
-                                "Submitted",
-                                style={
-                                    "padding": "12px",
-                                    "borderBottom": "2px solid black",
-                                },
-                            ),
+                            html.Th("Freiwillige/r", style={"textAlign": "center"}),
+                            html.Th("Eingereicht", style={"textAlign": "center"}),
                         ]
                     )
                 ),

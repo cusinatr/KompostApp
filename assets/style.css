@@ -1,4 +1,7 @@
-/* Single vw anchor — everything else derives from this */
+/* ------------------------------------------------ */
+/* Root scaling anchor                              */
+/* ------------------------------------------------ */
+
 :root {
     font-size: 1vw;
 }
@@ -8,6 +11,48 @@ html, body {
     padding: 0;
     height: 100%;
 }
+
+/* ------------------------------------------------ */
+/* Shared page wrapper                              */
+/* ------------------------------------------------ */
+
+.page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #4CAF50;
+    font-family: Arial;
+    color: white;
+    padding: 2.4rem;
+    box-sizing: border-box;
+}
+
+/* ------------------------------------------------ */
+/* Overview / scheduling page overrides             */
+/* ------------------------------------------------ */
+
+.overview-page {
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+}
+
+.overview-container {
+    width: min(70rem, 90vw);
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* ------------------------------------------------ */
+/* Login page                                       */
+/* ------------------------------------------------ */
 
 .login-page {
     height: 100vh;
@@ -77,6 +122,17 @@ html, body {
     caret-color: black;
 }
 
+.verification-message {
+    margin-top: 1.8rem;
+    font-size: 1.2rem;
+    color: #FFEBEE;
+    text-align: center;
+}
+
+/* ------------------------------------------------ */
+/* Buttons                                          */
+/* ------------------------------------------------ */
+
 .verify-button {
     background-color: #2E7D32;
     color: white;
@@ -84,7 +140,7 @@ html, body {
     height: 4.8rem;
     border: none;
     border-radius: 0.72rem;
-    font-size: 1.62rem;
+    font-size: 1.32rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -94,9 +150,431 @@ html, body {
     transform: scale(1.05);
 }
 
-.verification-message {
-    margin-top: 1.8rem;
-    font-size: 1.2rem;
-    color: #FFEBEE;
+.secondary-button {
+    background-color: #b71c1c;
+}
+
+.secondary-button:hover {
+    background-color: #7f0000;
+}
+
+.button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.button-disabled:hover {
+    background-color: #2E7D32;
+    transform: none;
+}
+
+.button-row {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.submit-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.3rem;
+}
+
+/* ------------------------------------------------ */
+/* Navbar                                           */
+/* ------------------------------------------------ */
+
+.navbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 1rem;
+    padding: 0.5rem 0.8rem;
+}
+
+.nav-link {
+    font-size: 1.3rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 1.2rem;
+    border-radius: 0.7rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.nav-link-active {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.nav-link-logout {
+    margin-left: auto;
+    color: #FFCDD2;
+    cursor: pointer;
+}
+
+.nav-link-logout:hover {
+    background-color: rgba(183, 28, 28, 0.3);
+    color: #ffffff;
+}
+
+/* ------------------------------------------------ */
+/* Shared table palette                             */
+/* ------------------------------------------------ */
+
+.overview-table-wrapper,
+.summary-table-wrapper,
+.scheduling-table-wrapper {
+    border-radius: 0.6rem;
+    border: 1px solid #90A4AE;
+    scrollbar-width: thin;
+    scrollbar-color: #90A4AE #B0BEC5;
+    overflow-y: auto;
+}
+
+/* ------------------------------------------------ */
+/* Overview table                                   */
+/* ------------------------------------------------ */
+
+.overview-title {
+    font-size: 3rem;
+    margin-bottom: 1.8rem;
+    margin-top: 0;
     text-align: center;
+}
+
+.overview-table-wrapper {
+    max-width: 60rem;
+    margin: 0 auto;
+    max-height: calc(65vh - 9.3rem);
+}
+
+.overview-table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.3rem;
+    font-family: Arial;
+}
+
+.overview-table-wrapper thead th {
+    padding: 1rem 1.6rem;
+    text-align: center;
+    background-color: #546E7A;
+    color: #ffffff;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.overview-table-wrapper tbody td {
+    padding: 0.9rem 1.6rem;
+    border-top: 1px solid #90A4AE;
+    color: #1C2B33;
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+.overview-table-wrapper tbody tr:nth-child(even) {
+    background-color: #CFD8DC;
+}
+
+.overview-table-wrapper tbody tr:nth-child(odd) {
+    background-color: #B0BEC5;
+}
+
+.overview-table-wrapper tbody tr:hover {
+    background-color: #90A4AE;
+}
+
+/* ------------------------------------------------ */
+/* Success page                                     */
+/* ------------------------------------------------ */
+
+.success-title {
+    font-size: 1.6rem;
+    font-weight: normal;
+    margin-bottom: 0.5rem;
+    opacity: 0.85;
+    text-align: center;
+}
+
+.summary-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.thank-you-title {
+    font-size: 3rem;
+    margin-bottom: 0.4rem;
+    text-align: center;
+}
+
+.summary-subtitle {
+    font-size: 1.3rem;
+    font-weight: normal;
+    margin-bottom: 1rem;
+    opacity: 0.85;
+    text-align: center;
+}
+
+.summary-table-wrapper {
+    max-height: 30vh;
+    width: min(36rem, 90vw);
+}
+
+.summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem;
+}
+
+.summary-th {
+    padding: 0.7rem 1.2rem;
+    text-align: center;
+    background-color: #546E7A;
+    color: #ffffff;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.summary-td {
+    padding: 0.6rem 1.2rem;
+    text-align: center;
+    border-top: 1px solid #90A4AE;
+    color: #1C2B33;
+}
+
+.summary-row:nth-child(even) {
+    background-color: #CFD8DC;
+}
+
+.summary-row:nth-child(odd) {
+    background-color: #B0BEC5;
+}
+
+.summary-row:hover {
+    background-color: #90A4AE;
+}
+
+/* ------------------------------------------------ */
+/* Scheduling page                                  */
+/* ------------------------------------------------ */
+
+.submission-note {
+    width: 100%;
+    padding: 0.8rem 1.4rem;
+    border-radius: 0.6rem;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    box-sizing: border-box;
+}
+
+.submission-note-open {
+    background-color: #E8F5E9;
+    color: #1B5E20;
+    border: 1px solid #A5D6A7;
+}
+
+.submission-note-closed {
+    background-color: #FFEBEE;
+    color: #B71C1C;
+    border: 1px solid #EF9A9A;
+}
+
+.welcome-message {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+}
+
+.welcome-message h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-message p {
+    margin: 0.3rem 0;
+}
+
+.welcome-message ul {
+    margin-top: 0.4rem;
+    padding-left: 1.5rem;
+}
+
+.welcome-message li {
+    margin-bottom: 0.3rem;
+}
+
+.submission-output {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+}
+
+/* ------------------------------------------------ */
+/* Calendar + table side by side                    */
+/* ------------------------------------------------ */
+
+.scheduling-main {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+/* ------------------------------------------------ */
+/* Calendar wrapper                                 */
+/* ------------------------------------------------ */
+
+.calendar-wrapper {
+    flex: 1;
+    background-color: #E8F5E9;
+    border-radius: 0.8rem;
+    padding: 2rem;
+    border: 1px solid #A5D6A7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.calendar-wrapper .mantine-DatePicker-root {
+    transform: none;
+    width: 100%;
+}
+
+.calendar-wrapper .mantine-Calendar-root,
+.calendar-wrapper .mantine-DatePicker-calendar {
+    width: 100% !important;
+}
+
+/* Month header — wildcard for version safety */
+.calendar-wrapper [class*="calendarHeader"] {
+    justify-content: center !important;
+    gap: 1rem !important;
+    width: 100% !important;
+}
+
+.calendar-wrapper [class*="calendarHeaderLevel"] {
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    color: #1B5E20 !important;
+    text-align: center !important;
+    flex: 1 !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+}
+
+/* Navigation arrows */
+.calendar-wrapper [class*="calendarHeaderControl"] {
+    color: #1B5E20 !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    flex-shrink: 0 !important;
+}
+
+.calendar-wrapper [class*="calendarHeaderControl"] svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    stroke: #1B5E20 !important;
+    stroke-width: 2.5 !important;
+}
+
+/* Weekday labels */
+.calendar-wrapper [class*="weekday"] {
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
+    color: #2E7D32 !important;
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    text-align: center !important;
+}
+
+/* Day numbers */
+.calendar-wrapper [class*="DatePicker-day"],
+.calendar-wrapper [class*="Calendar-day"] {
+    font-size: 1.2rem !important;
+    font-weight: 500 !important;
+    color: #1C2B33 !important;
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    line-height: 3.5rem !important;
+}
+
+/* Weekend override */
+.calendar-wrapper [data-weekend] {
+    color: #1C2B33 !important;
+}
+
+/* Selected days */
+.calendar-wrapper [data-selected] {
+    background-color: #2E7D32 !important;
+    color: #ffffff !important;
+}
+
+/* Disabled days */
+.calendar-wrapper [data-disabled] {
+    color: #A5D6A7 !important;
+    opacity: 0.5 !important;
+}
+
+/* Month rows */
+.calendar-wrapper [class*="monthRow"],
+.calendar-wrapper [class*="month"] {
+    width: 100% !important;
+}
+
+/* ------------------------------------------------ */
+/* Service hours reminder                           */
+/* ------------------------------------------------ */
+
+.service-hours-reminder {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #1B5E20;
+    line-height: 1.6;
+    width: 100%;
+}
+
+.service-hours-reminder ul {
+    margin: 0.3rem 0 0 0;
+    padding-left: 1.2rem;
+}
+
+.service-hours-reminder li {
+    margin-bottom: 0.2rem;
+}
+
+.reminder-title {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #1B5E20;
+}
+
+/* ------------------------------------------------ */
+/* Scheduling table wrapper                         */
+/* ------------------------------------------------ */
+
+.scheduling-table-wrapper {
+    flex: 1;
+    max-height: 34rem;
+    overflow-y: auto;
+    align-self: flex-start;
+    box-sizing: border-box;
 }

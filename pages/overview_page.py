@@ -1,64 +1,46 @@
 from dash import html, dcc
 
 overview_layout = html.Div(
-    style={
-        "width": "80%",
-        "margin": "auto",
-        "paddingTop": "30px",
-        "fontFamily": "Arial",
-    },
+    className="page overview-page",
     children=[
-        # -----------------------------------------
-        # Navigation bar
-        # -----------------------------------------
         html.Div(
-            style={
-                "display": "flex",
-                "gap": "30px",
-                "marginBottom": "30px",
-                "borderBottom": "1px solid lightgray",
-                "paddingBottom": "10px",
-            },
+            className="overview-container",
             children=[
-                dcc.Link(
-                    "Scheduling",
-                    href="/schedule",
-                    style={
-                        "fontSize": "20px",
-                        "textDecoration": "none",
-                        "color": "gray",
-                    },
+                # -----------------------------------------
+                # Navigation bar
+                # -----------------------------------------
+                html.Div(
+                    className="navbar",
+                    children=[
+                        dcc.Link(
+                            "Einsatzplanung", href="/schedule", className="nav-link"
+                        ),
+                        dcc.Link(
+                            "Übersicht",
+                            href="/overview",
+                            className="nav-link nav-link-active",
+                        ),
+                        html.A(
+                            "Abmelden",
+                            id="logout-link",
+                            className="nav-link nav-link-logout",
+                        ),
+                    ],
                 ),
-                dcc.Link(
-                    "Overview",
-                    href="/overview",
-                    style={
-                        "fontWeight": "bold",
-                        "fontSize": "20px",
-                        "textDecoration": "none",
-                        "color": "black",
-                    },
+                # -----------------------------------------
+                # Title
+                # -----------------------------------------
+                html.H1(
+                    "Zusammenfassung der Verfügbarkeitsmeldung",
+                    className="overview-title",
                 ),
-                html.A(
-                    "Logout",
-                    id="logout-link",
-                    style={
-                        "fontSize": "20px",
-                        "color": "red",
-                        "cursor": "pointer",
-                        "textDecoration": "none",
-                    },
+                # -----------------------------------------
+                # Table
+                # -----------------------------------------
+                html.Div(
+                    id="overview-table-container", className="overview-table-wrapper"
                 ),
             ],
-        ),
-        # -----------------------------------------
-        # Title
-        # -----------------------------------------
-        html.H1("Volunteer Availability Overview"),
-        html.Br(),
-        # -----------------------------------------
-        # Table
-        # -----------------------------------------
-        html.Div(id="overview-table-container"),
+        )
     ],
 )
