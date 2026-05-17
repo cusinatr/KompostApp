@@ -112,6 +112,11 @@ def register_callbacks(app):
     # Success Summary
     # ---------------------------------------------------
 
+    AVAILABILITY_LABELS = {
+        "Free": "Frei",
+        "Can make it work": "Geht notfalls",
+    }
+
     @app.callback(
         Output("success-summary", "children"),
         Input("submitted-data-store", "data"),
@@ -137,9 +142,7 @@ def register_callbacks(app):
                                     html.Tr(
                                         [
                                             html.Th("Datum", className="summary-th"),
-                                            html.Th(
-                                                "Verfügbarkeit", className="summary-th"
-                                            ),
+                                            html.Th("Verfügbarkeit", className="summary-th"),
                                         ]
                                     )
                                 ),
@@ -148,11 +151,12 @@ def register_callbacks(app):
                                         html.Tr(
                                             className="summary-row",
                                             children=[
+                                                html.Td(row["date"], className="summary-td"),
                                                 html.Td(
-                                                    row["date"], className="summary-td"
-                                                ),
-                                                html.Td(
-                                                    row["availability"],
+                                                    AVAILABILITY_LABELS.get(
+                                                        row["availability"],
+                                                        row["availability"]
+                                                    ),
                                                     className="summary-td",
                                                 ),
                                             ],
