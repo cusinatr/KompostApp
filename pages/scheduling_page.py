@@ -191,7 +191,7 @@ scheduling_layout = html.Div(
                                     columns=[
                                         {"name": "Datum", "id": "date"},
                                         {
-                                            "name": "Präferenz",
+                                            "name": "Verfügbarkeit",
                                             "id": "availability",
                                             "presentation": "dropdown",
                                         },
@@ -204,7 +204,7 @@ scheduling_layout = html.Div(
                                             "options": [
                                                 {"label": "Frei", "value": "Free"},
                                                 {
-                                                    "label": "Kann funktionieren",
+                                                    "label": "Geht notfalls",
                                                     "value": "Can make it work",
                                                 },
                                             ]
@@ -213,7 +213,7 @@ scheduling_layout = html.Div(
                                     style_table={
                                         "overflowX": "auto",
                                         "overflowY": "auto",
-                                        "height": "100%",
+                                        "maxHeight": "34rem",
                                         "borderRadius": "0.6rem",
                                         "border": "1px solid #90A4AE",
                                     },
