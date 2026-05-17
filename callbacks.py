@@ -242,7 +242,7 @@ def register_callbacks(app):
 
         welcome = html.Div(
             [
-                html.H3(f"Dear {volunteer}, welcome!"),
+                html.H3(f"{volunteer}, herzlich willkommen!"),
             ]
         )
 

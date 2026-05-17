@@ -6,8 +6,7 @@
     font-size: 1vw;
 }
 
-html,
-body {
+html, body {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -238,6 +237,7 @@ body {
     border: 1px solid #90A4AE;
     scrollbar-width: thin;
     scrollbar-color: #90A4AE #B0BEC5;
+    overflow-y: auto;
 }
 
 /* ------------------------------------------------ */
@@ -252,7 +252,7 @@ body {
 }
 
 .overview-table-wrapper {
-    max-width: 45rem;
+    max-width: 60rem;
     margin: 0 auto;
     max-height: calc(65vh - 9.3rem);
 }
@@ -545,7 +545,7 @@ body {
 
 .service-hours-reminder {
     margin-top: 1.5rem;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: #1B5E20;
     line-height: 1.6;
     width: 100%;
@@ -563,7 +563,7 @@ body {
 .reminder-title {
     margin: 0;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.3rem;
     color: #1B5E20;
 }
 
@@ -573,20 +573,6 @@ body {
 
 .scheduling-table-wrapper {
     flex: 1;
-    max-height: 34rem;
-    overflow-y: auto;
-    overflow-x: visible;
     align-self: flex-start;
     box-sizing: border-box;
-    padding-bottom: 6rem;
-}
-
-/* ------------------------------------------------ */
-/* DataTable dropdown fix                           */
-/* ------------------------------------------------ */
-
-.scheduling-table-wrapper .Select-menu-outer,
-.dash-spreadsheet .Select-menu-outer {
-    position: absolute !important;
-    z-index: 9999 !important;
 }
