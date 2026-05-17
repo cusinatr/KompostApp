@@ -1,5 +1,4 @@
 import sqlite3
-from config import DB_NAME
 from config import DB_PATH
 
 # ---------------------------------------------------
@@ -9,8 +8,8 @@ from config import DB_PATH
 
 def initialize_database():
 
-    conn = sqlite3.connect(DB_PATH)
-
+    conn = sqlite3.connect(DB_PATH, timeout=30)
+    conn.execute("PRAGMA journal_mode=WAL;")
     cursor = conn.cursor()
 
     # Volunteers table
@@ -41,7 +40,7 @@ def initialize_database():
 
 def save_availability_submission(volunteer, table_data):
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
 
     cursor = conn.cursor()
 
@@ -88,7 +87,7 @@ def save_availability_submission(volunteer, table_data):
 
 def load_all_availabilities():
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
 
     cursor = conn.cursor()
 
@@ -112,7 +111,7 @@ def load_all_availabilities():
 
 def load_volunteer_availability(volunteer):
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
 
     cursor = conn.cursor()
 
@@ -140,7 +139,7 @@ def load_volunteer_availability(volunteer):
 
 def load_availability_statistics():
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
 
     cursor = conn.cursor()
 
@@ -167,7 +166,7 @@ def load_availability_statistics():
 
 def load_submitted_volunteers():
 
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
 
     cursor = conn.cursor()
 
